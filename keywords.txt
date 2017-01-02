@@ -1,0 +1,4 @@
+Messenger	KEYWORD1
+message	KEYWORD1
+parseMessage	KEYWORD2
+reset	KEYWORD2
