@@ -2,3 +2,7 @@ Messenger	KEYWORD1
 message	KEYWORD1
 parseMessage	KEYWORD2
 reset	KEYWORD2
+sendGetMessage  KEYWORD2
+sendPutMessage  KEYWORD2
+print KEYWORD2
+printPROGMEM  KEYWORD2

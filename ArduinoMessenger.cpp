@@ -1,11 +1,9 @@
-
 #define AM_GLOBAL
 #include "ArduinoMessenger.h"
 #undef AM_GLOBAL
+Messenger::Messenger(Stream& s):stream(s) {}
+Messenger::Messenger():stream(Serial){}
 
-
-Messenger::Messenger() {
-}
 
 void Messenger::reset(message *result) {
 	result->value = message_size.value;
@@ -26,6 +24,59 @@ bool compare(char * a, const char * b) {
 	return false;
 }
 
+bool Messenger::readFromStream(message * result){
+	int size = 0;
+	bool parseResult = false;
+
+	if(size = stream.available()){
+		if(size < M_BUF){
+
+			buffer = (byte*)malloc(size);
+			size = stream.readBytes(buffer,size);
+
+			if(buffer != NULL){
+				parseResult = parseMessage(result,buffer,size);
+			}
+
+			free(buffer);
+		} else {
+			stream.flush();
+		}
+	}
+	return parseResult;
+}
+
+bool Messenger::parseMessage(message * result){
+	return readFromStream(result);
+}
+void Messenger::printPROGMEM(const char* mem){
+	strcpy_P(mem_buf, mem);
+	print(mem_buf);
+}
+void Messenger::print(const char* mem){
+	stream.print(mem);
+}
+void Messenger::print(int value){
+	stream.print(value);
+}
+
+void Messenger::sendGetMessage(char * request){
+	printPROGMEM(GET);
+	print("\n");
+	printPROGMEM(request_prefix);
+	print(request);
+	printPROGMEM(suffix);
+}
+
+void Messenger::sendPutMessage(char * resource,char * value){
+	printPROGMEM(PUT);
+	print("\n");
+	printPROGMEM(resource_prefix);
+	print(resource);
+	printPROGMEM(value_prefix);
+	print(value);
+	printPROGMEM(suffix);
+}
 bool Messenger::parseMessage(message * result, byte * msg, int size) {
 	reset(result);
 	if (!validateSize(size)) {
@@ -100,7 +151,7 @@ bool Messenger::validateType(char * type) {
 	if (compare(type, GET)) {
 		return true;
 	}
-	else if (compare(type, SEND)) {
+	else if (compare(type, PUT)) {
 		return true;
 	}
 	else if (compare(type, HELLO)) {
@@ -111,7 +162,7 @@ bool Messenger::validateType(char * type) {
 }
 
 bool Messenger::validateContent(message * result) {
-	return true;
+	return true; //TODO
 }
 
 
